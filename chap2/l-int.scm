@@ -3,19 +3,15 @@
   #:use-module (srfi srfi-1)
   #:use-module (chap2 base)
   #:export (interp-l-int
-	    <interp-l-int>
             interp-exp
             <+>
 	    ))
-
-(define-class <interp-l-int> (<interp-base>)
-  (env #:getter env #:init-keyword #:env))
 
 (define-class <int> (<l-base>)
   (value #:init-value 0 #:getter value #:init-keyword #:value)
   (leaf #:init-value #t #:getter leaf?))
 
-(define-method (interp-exp (n <int>) (interp <interp-l-int>))
+(define-method (interp-exp (n <int>) env)
   (value n))
 
 (define-public (Int v)
@@ -38,12 +34,12 @@
   (args #:init-value '() #:getter args #:init-keyword #:args)
   (leaf #:init-value #f #:getter leaf? #:init-keyword #:leaf))
   
-(define-method (interp-exp (ast <->) (interp <interp-l-int>))
+(define-method (interp-exp (ast <->) env)
   (let ((a (args ast)))
 	   (if (null? (cdr a))
-	       (- (interp-exp (car a) interp))
-               (- (interp-exp (car a) interp)
-		  (interp-exp (cadr a) interp)))))
+	       (- (interp-exp (car a) env))
+               (- (interp-exp (car a) env)
+		  (interp-exp (cadr a) env)))))
 
 (define-public (Prim op . args)
   (make op #:args args #:leaf (null? args)))
@@ -52,10 +48,10 @@
   (args #:init-value '() #:getter args #:init-keyword #:args)
   (leaf #:init-value #f #:getter leaf? #:init-keyword #:leaf))
 
-(define-method (interp-exp (ast <+>) (interp <interp-l-int>))
+(define-method (interp-exp (ast <+>) env)
   (let ((a (args ast)))
-           (+ (interp-exp (car a) interp)
-	      (interp-exp (cadr a) interp))))
+           (+ (interp-exp (car a) env)
+	      (interp-exp (cadr a) env))))
               
 (define (interp-l-int p)
-  (interp-exp p (make <interp-l-int> #:env (make-hash-table))))
+  (interp-exp p (make-hash-table)))
