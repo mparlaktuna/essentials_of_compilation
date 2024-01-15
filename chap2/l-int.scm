@@ -55,3 +55,9 @@
               
 (define (interp-l-int p)
   (interp-exp p (make-hash-table)))
+
+(define-method (display (n <int>) p)
+  (format p "<int: ~a>" (value n)))
+
+(define-method (display (n <prim>) p)
+  (format p "<Prim ~a>\n" (class-name (class-of n))))
