@@ -2,6 +2,7 @@
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
   #:use-module (chap2 base)
+  #:use-module (ice-9 pretty-print)
   #:export (interp-l-int
             interp-exp
             <+>
@@ -60,4 +61,9 @@
   (format p "<int: ~a>" (value n)))
 
 (define-method (display (n <prim>) p)
-  (format p "<Prim ~a>\n" (class-name (class-of n))))
+  (pretty-print (format #f "(Prim ~a~{ ~a~})"
+	  (class-name (class-of n))
+          (args n)) p #:display? #t))
+
+(define-method (uniquify-exp (ast <prim>) env)
+  ast)

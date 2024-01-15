@@ -3,7 +3,10 @@
   #:use-module (srfi srfi-1)
   #:export (<l-base>
 	    <interp-base>
-            env))
+            env
+            uniquify-exp
+            uniquify
+            ))
 
 (define-generic is-exp?)
 (define-generic interp-exp)
@@ -14,4 +17,10 @@
 (define-class <interp-base> ()
   (env #:getter env #:init-keyword #:env))  
 
+(define-generic uniquify-exp)
 
+(define-method (uniquify-exp ast env)
+  ast)
+
+(define (uniquify p)
+  (uniquify-exp p '()))

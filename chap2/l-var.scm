@@ -3,12 +3,12 @@
   #:use-module (srfi srfi-1)
   #:use-module (chap2 base)
   #:use-module (chap2 l-int)
+  #:use-module (ice-9 pretty-print)
   #:export (interp-l-var
 	    <var>
             <let>
             name
             name!
-            Var
 	    ))
 
 
@@ -36,8 +36,35 @@
 	      (assoc-set! env
 			  (var ast)
 			  (interp-exp (var-exp ast) env))))
+                          
+(define-method (uniquify-exp (ast <var>) env)
+  (let ((n (assoc-ref env (name ast))))
+    (if n
+	(values (Var n) env)
+        (let ((nn (gensym)))
+          (values (Var nn) (assoc-set! env (name ast) nn))))))
 
+(define-method (uniquify-exp (ast <let>) env)
+  (let* ((name (var ast))
+	 (n (assoc-ref env name)))
+    (if n
+	(Let n
+             (uniquify-exp (var-exp ast) env)
+             (uniquify-exp (exp ast) env))
+        (let* ((nn (gensym))
+               (ne (assoc-set! env name nn)))
+          (values (Let nn
+		       (uniquify-exp (var-exp ast) ne)
+		       (uniquify-exp (exp ast) ne))
+                  ne)))))
 
 (define (interp-l-var p)
   (interp-exp p (make-hash-table)))
 
+;; (define-method (display (n <let>) p)
+;;   (pretty-print (format #f "(let ~a~{ ~a~})"
+;; 	  (class-name (class-of n))
+;;           (args n)) p #:display? #t))
+
+(define-method (display (n <var>) p)
+  (format p "(Var ~a)" (name n)))
