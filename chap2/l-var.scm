@@ -4,11 +4,16 @@
   #:use-module (chap2 base)
   #:use-module (chap2 l-int)
   #:export (interp-l-var
+	    <var>
+            <let>
+            name
+            name!
+            Var
 	    ))
 
 
 (define-class <var> (<l-base>)
-  (name #:init-value "" #:getter name #:init-keyword #:name)
+  (name #:init-value "" #:getter name #:init-keyword #:name #:setter name!)
   (leaf #:init-value #t #:getter leaf?))
 
 (define (Var n)
