@@ -61,7 +61,10 @@
   (format p "<int: ~a>" (value n)))
 
 (define-method (display (n <prim>) p)
-  (pretty-print (format #f "(Prim ~a~{ ~a~})"
+  ;; (format #f "(Prim ~a" (class-name (class-of n)))
+  ;; (format #t "asd")
+  ;; )
+  (pretty-print (format #f "(Prim ~a\n~{-~a~}\n)"
 	  (class-name (class-of n))
           (args n)) p #:display? #t))
 
