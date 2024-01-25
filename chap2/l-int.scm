@@ -6,6 +6,8 @@
   #:export (interp-l-int
             interp-exp
             <+>
+            <prim>
+            args
 	    ))
 
 (define-class <int> (<l-base>)

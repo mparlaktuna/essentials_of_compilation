@@ -58,13 +58,15 @@
 		       (uniquify-exp (exp ast) ne))
                   ne)))))
 
+(define-method (uniquify-exp (ast <prim>) env)
+  (Prim (class-of ast)
+	(map (lambda (x)
+	       (uniquify-exp x env))
+             (args ast))))
+
+
 (define (interp-l-var p)
   (interp-exp p (make-hash-table)))
-
-;; (define-method (display (n <let>) p)
-;;   (pretty-print (format #f "(let ~a~{ ~a~})"
-;; 	  (class-name (class-of n))
-;;           (args n)) p #:display? #t))
 
 (define-method (display (n <var>) p)
   (format p "(Var ~a)" (name n)))
