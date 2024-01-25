@@ -6,6 +6,8 @@
             env
             uniquify-exp
             uniquify
+            remove-complex-operands
+            remove-complex
             ))
 
 (define-generic is-exp?)
@@ -19,8 +21,15 @@
 
 (define-generic uniquify-exp)
 
-(define-method (uniquify-exp ast env)
-  ast)
+;; (define-method (uniquify-exp ast env)
+;;   ast)
+
+(define-generic remove-complex-operands)
 
 (define (uniquify p)
   (uniquify-exp p '()))
+
+(define (remove-complex p)
+  (remove-complex-operands p '()))
+
+

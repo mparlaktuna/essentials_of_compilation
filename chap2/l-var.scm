@@ -59,11 +59,16 @@
                   ne)))))
 
 (define-method (uniquify-exp (ast <prim>) env)
-  (Prim (class-of ast)
-	(map (lambda (x)
-	       (uniquify-exp x env))
-             (args ast))))
+  (values (Prim (class-of ast)
+		(map (lambda (x)
+		       (uniquify-exp x env))
+		     (args ast))) env))
 
+(define-method (remove-complex-operands (ast <var>) env)
+  ast)
+  
+(define-method (remove-complex-operands (ast <prim>) env)
+  ast)
 
 (define (interp-l-var p)
   (interp-exp p (make-hash-table)))
