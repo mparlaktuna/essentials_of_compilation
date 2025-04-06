@@ -1,3 +1,7 @@
 * Todo
+** Create folder structure
+*** create base program streucture
+*** lanbuage conversions 
+*** compilers 
 ** Add error management
 *** Add basic types for error messages
