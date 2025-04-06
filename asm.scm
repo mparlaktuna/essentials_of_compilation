@@ -1,7 +1,13 @@
 (define-module (asm)
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
-  #:export (instr->string))
+  #:use-module (compiler)
+  #:export (instr->string
+	    append-asm
+	    get-asm
+	    code
+	    block
+	    label))
 
 (define-class <asm> ())
 (define-class <$arg> (<asm>))
@@ -14,17 +20,23 @@
 (define-method (display (i <$int>) p)
   (format p "$~a" (value i)))
 
-(define-method (assembly (i <$int>)))
 (define-class <$reg> (<$arg>)
   (name #:init-keyword #:name #:getter name))
-
 
 (define-method (display (r <$reg>) p)
   (format p "%~a" (name r)))
 
 
 (define-class <instr> (<asm>))
-(define-class <x86> ())
+
+(define-class <$label> (<$arg>)
+  (name #:init-keyword #:name #:getter name))
+
+(define-public ($label name)
+  (make <$label> #:name name))
+
+(define-method (display (l <$label>) p)
+  (format p "~a" (name l)))
 
 (define-syntax create-instruction
   (lambda (x)
@@ -51,12 +63,27 @@
 	       (define-method (name (arg <$arg>)...)
 	       	 (make def #,@#`args))
 	       (define-method (display (i def) p)
-	       	 (format p "~a ~{~a~^, ~}" (text i) (list (arg i) ...)))
+	       	 (format p "~/~a ~{~a~^, ~}" (text i) (list (arg i) ...)))
 	       (export def name))))))))
+
+(define-syntax create-register
+  (lambda (x)
+    (syntax-case x ()
+      ((_ name)
+       (with-syntax ([str (symbol->string (syntax->datum #'name))])
+	 #'(define-public name (make <$reg> #:name str)))))))
+
+(define-syntax create-registers
+  (syntax-rules ()
+    ((_ r)
+     (create-register r))
+    ((_ r1 r2 ...)
+     (begin
+       (create-register r1)
+       (create-register r2) ...))))
 
 (define-method (instr->string (a <instr>))
   (format #f "~a" a))
-
 
 (create-instruction addq ((op1) (op2)))
 (create-instruction subq ((op1) (op2)))
@@ -64,19 +91,56 @@
 (create-instruction movq ((op1) (op2)))
 (create-instruction pushq ((op1)))
 (create-instruction popq ((op1)))
-(create-instruction callq ((op1)))
+(create-instruction callq ((label)))
 (create-instruction jump ((op1)))
 (create-instruction retq ())
+(create-instruction .globl ((label)))
 
-(define-public rsp (make <$reg> #:name "rsp"))
+(create-registers rsp
+		  rbp
+		  rax
+		  rbx
+		  rcx
+		  rdx
+		  rsi
+		  rdi
+		  r8
+		  r9
+		  r10
+		  r11
+		  r12
+		  r13
+		  r14
+		  r15)
 
-;; (define-class <addq> (<instr>)
-;;   (arg1 #:init-keyword #:arg1 #:getter arg1)
-;;   (arg2 #:init-keyword #:arg1 #:getter arg2)
-;;   (arg-size #:init-value 2)
-;;   (text #:init-value "addq")
-;;   (opcode #:init-value 0))
+(define-class <progn> ()
+  (file #:init-keyword #:file #:accessor file)
+  (code #:init-keyword #:code #:accessor code))
 
-;; (define-method (binary (i <instr>))
-;;   ;; converts to binary formmat
-;;   0)
+(define-class <assembly> (<progn>))
+
+(define-class <block> (<asm> <progn>)
+  (label #:init-keyword #:label #:accessor label)
+  (code #:init-value '() #:accessor code))
+
+(define-method (block (l <$label>))
+  (make <block> #:label l))
+
+(define-public (assembly file)
+  (make <assembly> #:file file #:code (list (.globl ($label "main")))))
+
+(define-method (append-asm (p <progn>) (a <asm>))
+  (set! (code p) (cons a (code p))))
+
+(define-method (get-asm (p <assembly>) l)
+  (list-ref (code p) l))
+
+(define-method (display (a <assembly>) p)
+  (format p "file: ~a\n\n~{~a\n~}\n" (file a) (reverse (code a))))
+
+(define-method (display (b <block>) p)
+  (format p "~a\n~{~a~^\n~}" (label b) (reverse (code b))))
+
+;; (define-class <assembly> (<compiler>))
+;; (define-method (assembly (i <$int>)))
+

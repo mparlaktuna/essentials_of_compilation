@@ -1,4 +1,3 @@
 * Todo
 ** Add error management
 *** Add basic types for error messages
-** Add display functions for each types

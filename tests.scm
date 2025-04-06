@@ -90,11 +90,21 @@
 
 (test-begin "asm")
 
-(test-equal "addq $1, $2" (instr->string (addq ($int 1) ($int 2))))
-(test-equal "addq $1, %rsp" (instr->string (addq ($int 1) rsp)))
+(test-equal "addq $1, $2" (string-trim (instr->string (addq ($int 1) ($int 2)))))
+(test-equal "addq $1, %rsp" (string-trim (instr->string (addq ($int 1) rsp))))
+
 ;; (test-equal "negq 1" (asm->string (negq 1)))
 ;; (test-equal "retq" (asm->string (retq)))
 
+(let ((a (assembly "test.asm")))
+  ;; (append-asm a (addq ($int 1) ($int 2)))
+  (let ((main (block ($label "main")))
+	(p (block ($label "print"))))
+    (append-asm main (movq ($int 10) rax))
+    (append-asm main (addq ($int 32) rax))
+    (append-asm main (retq))
+    (append-asm a main))
+  (format #t "~a" a))
 
 (test-end "asm")
 
