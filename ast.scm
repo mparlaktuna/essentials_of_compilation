@@ -16,18 +16,23 @@
 	    env-size
 	    <env>
 	    symbol-eq?
-	    add))
+	    add
+	    get))
 
 ;; class for expression
 (define-class <exp> ()
   (value #:init-value '() #:init-keyword #:value #:getter value))
 
+(define-class <error> ())
 
 (define-method (exp-equal? (l <exp>) (r <exp>))
   (equal? (value l) (value r)))
 
 (define-method (exp? e) #f)
 (define-method (exp? (e <exp>)) #t)
+
+(define-method (display (e <exp>) p)
+  (format p "type: ~a value: ~a \n" (class-of e) (value e)))
 
 ;; class for leaf, leaf is also an expression but its evaluation will be concluded
 ;; while exp will have more nodes to evaluate
@@ -77,7 +82,6 @@
 	      (get p s)
 	      'error))
 	r)))
-
 
 (define-class <prog> ()
   (exp #:init-value '() #:init-keyword #:exp #:getter exp))

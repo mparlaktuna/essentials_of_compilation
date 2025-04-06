@@ -1,7 +1,10 @@
 (add-to-load-path ".")
-(use-modules (srfi srfi-64)
-	     (oop goops)
+(use-modules (oop goops)
+	     (oop goops describe)
+	     (srfi srfi-64)
+	     (tester)
 	     (ast)
+	     (asm)
 	     (l-int))
 
 (test-begin "compiler")
@@ -37,7 +40,7 @@
 (let ((e1 (Env)))
   (test-eq 0 (env-size e1))
   (add e1 (Symbol 'num) (Int 5))
-  (test-assert (exp-eq (Int 5) (get e1 (Symbol 'num))))
+  (test-assert (exp-equal? (Int 5) (get e1 (Symbol 'num))))
   (test-eq 1 (env-size e1))
   (let ((e2 (Env e1)))
     (test-eq 1 (env-size e2))
@@ -84,4 +87,15 @@
   (test-equal 15 (fx-eval p)))
 
 (test-end "l-int")
+
+(test-begin "asm")
+
+(test-equal "addq $1, $2" (instr->string (addq ($int 1) ($int 2))))
+(test-equal "addq $1, %rsp" (instr->string (addq ($int 1) rsp)))
+;; (test-equal "negq 1" (asm->string (negq 1)))
+;; (test-equal "retq" (asm->string (retq)))
+
+
+(test-end "asm")
+
 (test-end "compiler")
