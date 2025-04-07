@@ -1,7 +1,16 @@
 * Todo
 ** Create folder structure
 *** create base program streucture
-*** lanbuage conversions 
+*** languages
+*** program can have any type of language in it in the sequence
+*** scheme code
+*** ast
+*** asm
+**** x86
+**** aarch64
 *** compilers 
+**** scheme -> ast
+**** ast -> asm
+**** asm -> binary
 ** Add error management
 *** Add basic types for error messages
