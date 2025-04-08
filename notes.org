@@ -14,3 +14,12 @@
 **** asm -> binary
 ** Add error management
 *** Add basic types for error messages
+
+* progn
+** list of progns
+** scheme -> ast
+** ast -> asm
+** asm -> binary
+
+use _ for ast for all types function names...
+use $ for asm for all types function names...

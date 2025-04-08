@@ -1,4 +1,4 @@
-(define-module (tester)
+(define-module (base tester)
   #:use-module (srfi srfi-64))
 
 (define (compiler-test-runner)

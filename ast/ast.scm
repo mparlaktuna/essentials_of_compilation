@@ -1,4 +1,4 @@
-(define-module (ast)
+(define-module (ast ast)
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-69)

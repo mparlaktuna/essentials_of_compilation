@@ -1,13 +1,16 @@
-(define-module (asm)
+(define-module (asm asm)
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
-  #:use-module (compiler)
+  #:use-module (compiler base)
   #:export (instr->string
 	    append-asm
 	    get-asm
 	    code
 	    block
-	    label))
+	    label
+	    create-instruction
+	    create-register
+	    create-registers))
 
 (define-class <asm> ())
 (define-class <$arg> (<asm>))
@@ -26,8 +29,7 @@
 (define-method (display (r <$reg>) p)
   (format p "%~a" (name r)))
 
-
-(define-class <instr> (<asm>))
+(define-class <instr> (<asm> <code>))
 
 (define-class <$label> (<$arg>)
   (name #:init-keyword #:name #:getter name))
@@ -85,34 +87,6 @@
 (define-method (instr->string (a <instr>))
   (format #f "~a" a))
 
-(create-instruction addq ((op1) (op2)))
-(create-instruction subq ((op1) (op2)))
-(create-instruction negq ((op1)))
-(create-instruction movq ((op1) (op2)))
-(create-instruction pushq ((op1)))
-(create-instruction popq ((op1)))
-(create-instruction callq ((label)))
-(create-instruction jump ((op1)))
-(create-instruction retq ())
-(create-instruction .globl ((label)))
-
-(create-registers rsp
-		  rbp
-		  rax
-		  rbx
-		  rcx
-		  rdx
-		  rsi
-		  rdi
-		  r8
-		  r9
-		  r10
-		  r11
-		  r12
-		  r13
-		  r14
-		  r15)
-
 (define-class <progn> ()
   (file #:init-keyword #:file #:accessor file)
   (code #:init-keyword #:code #:accessor code))
@@ -126,8 +100,8 @@
 (define-method (block (l <$label>))
   (make <block> #:label l))
 
-(define-public (assembly file)
-  (make <assembly> #:file file #:code (list (.globl ($label "main")))))
+;; (define-public (assembly file)
+;;   (make <assembly> #:file file #:code (list (.globl ($label "main")))))
 
 (define-method (append-asm (p <progn>) (a <asm>))
   (set! (code p) (cons a (code p))))
@@ -140,6 +114,8 @@
 
 (define-method (display (b <block>) p)
   (format p "~a\n~{~a~^\n~}" (label b) (reverse (code b))))
+
+;; asm->binary
 
 ;; (define-class <assembly> (<compiler>))
 ;; (define-method (assembly (i <$int>)))
